@@ -1,6 +1,7 @@
 /**
- * Created by lihongwei on 2017/3/17.
+ * Created by Administrator on 2017/3/17.
  */
+
 
 (function (window) {
     var arr = [];
@@ -12,13 +13,14 @@
     var class2type={};
     for (var i = 0; i < types.length; i++) {
         var type = types[i];
-        class2type["[object "+type+"]"]=type.toLowerCase();//class2type["[object Number]"]="number"
+        class2type["[object "+type+"]"]=type.toLowerCase();
     }
 
     function Sizzle(seletcor) {
         return document.querySelectorAll(seletcor);
     }
 
+    //定义jq的核心方法
     function jQuery(selector) {
         return new jQuery.fn.init(selector);
     }
@@ -28,13 +30,13 @@
         init: function (selector) {
 
             splice.call(this, 0, this.length);
-            push.apply(this, Sizzle(selector));
-            return this;
-        },
-        css: function (styleName, styleValue) {
-            for (var i = 0; i < this.length; i++) {
-                var ele = this[i];
-                ele.style[styleName] = styleValue;
+            if(selector == null) return this;
+
+            if(jQuery.isString(selector)){
+                push.apply(this, Sizzle(selector));
+            }else {
+                this[0]=selector;
+                this.length=1;
             }
 
             return this;
@@ -61,6 +63,7 @@
         }
         return target;
     }
+
     jQuery.fn.init.prototype = jQuery.fn;
 
     function isLikeArray(array){
@@ -70,7 +73,9 @@
 
     jQuery.extend({
         each: function (array,callback) {
+
 		var i;
+
             if(isLikeArray(array)){
                 for (i = 0; i < array.length; i++) {
 
@@ -87,7 +92,7 @@
                     }
                 }
             }
-
+            return this;
         },
 
         isString: function (str) {
@@ -137,7 +142,107 @@
     jQuery.fn.extend({
         each:function(callback){
             jQuery.each(this,callback);
-		 return this;
+            return this;
+        }
+
+    });
+
+    //css模块
+    jQuery.fn.extend({
+        css: function () {
+
+            var len = arguments.length;
+
+            if (len == 0) return this;
+            var arg0 = arguments[0];
+            var arg1 = arguments[1];
+
+            if (len == 1) {
+                if (jQuery.isString(arg0)) {
+
+                    var firstDom = this[0];
+                    var styles = window.getComputedStyle(firstDom, null);
+                    return styles[arg0];
+                } else {
+                    return this.each(function () {
+
+                        var dom = this;
+
+                        jQuery.each(arg0, function (styleName, styleValue) {
+                            dom.style[styleName] = styleValue;
+                        });
+                    });
+
+                }
+            } else {
+
+                return this.each(function () {
+                    this.style[arg0] = arg1;
+                })
+            }
+        },
+
+        show:function(){
+            return this.css('display','block');
+        },
+
+        hide:function(){
+            return this.css('display','none');
+        },
+
+        toggle:function(){
+            this.each(function(){
+                var $dom = $(this);
+                if($dom.css('display') === 'none'){
+                    $dom.show();
+                }else{
+                    $dom.hide();
+                }
+            });
+        }
+    });
+
+    //dom操作
+    jQuery.fn.extend({
+
+        get:function(){
+            if(arguments.length == 0){
+                return jQuery.makeArray(this);
+            }else {
+                var arg0 = arguments[0];
+                if(arg0 >= 0){
+                    return this[arg0];
+                }else {
+                    return this[this.length + arg0];
+                }
+            }
+        },
+
+        first:function(){
+            var firstDom = this.get(0);
+            return jQuery(firstDom);
+        },
+
+        last:function(){
+
+            var lastDom = this.get(-1);
+            return jQuery(lastDom);
+        },
+
+        eq:function(index){
+            var dom = this.get(index);
+            return jQuery(dom);
+        },
+
+        find:function(selector){
+            var $ = jQuery();
+
+            this.each(function(){
+                var dom=this.querySelectorAll(selector);
+                jQuery.merge($,dom);
+            });
+
+            return $;
         }
     });
 

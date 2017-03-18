@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        div {
+            width: 200px;
+            height: 200px;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+<div class="hello">你好，我是div</div>
+<ul>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+</ul>
+<input type="button" value="显示" id="show"/>
+<input type="button" value="隐藏" id="hide"/>
+<input type="button" value="toggle" id="toggle"/>
+<div style="width: 20px;height: 20px;background-color: red;" id="haha"></div>
+</body>
+<script src="myJqueryannotation2.1.js"></script>
+<script>
+
+    console.log($('.hello').css('height'));
+//    console.log($('.hello').css('color','red'));
+    $('.hello').css({'color':'blue','fontSize':'30px'}).css('backgroundColor','green');
+
+    $('#toggle')[0].onclick = function(){
+        $('#haha').toggle();
+    }
+
+    $('#show')[0].onclick = function(){
+        $('#haha').show();
+    }
+    $('#hide')[0].onclick = function(){
+        $('#haha').hide();
+    }
+
+    $('li').each(function(){
+        this.style.backgroundColor = 'blue';
+    }).css('backgroundColor','red');
+
+</script>
+</html>

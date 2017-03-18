@@ -70,8 +70,9 @@
 
     jQuery.extend({
         each: function (array,callback) {
+		var i;
             if(isLikeArray(array)){
-                for (var i = 0; i < array.length; i++) {
+                for (i = 0; i < array.length; i++) {
 
                     var result = callback.call(array[i],i,array[i]);
                     if(result === false){
@@ -136,6 +137,7 @@
     jQuery.fn.extend({
         each:function(callback){
             jQuery.each(this,callback);
+		 return this;
         }
     });
 

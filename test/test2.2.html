@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        div {
+            width: 200px;
+            height: 200px;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+<div class="hello">你好，我是div</div>
+<ul>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+</ul>
+<input type="button" value="显示" id="show"/>
+<input type="button" value="隐藏" id="hide"/>
+<input type="button" value="toggle" id="toggle"/>
+<div style="width: 20px;height: 20px;background-color: red;" id="haha"></div>
+
+
+<div><span>123</span></div>
+<div><span>1234</span></div>
+<div><span>1235</span></div>
+<div><span>1236</span></div>
+<div><span>1237</span></div>
+</body>
+<script src="myJquery2.2.js"></script>
+<script>
+
+</script>
+<script>
+    console.log($('li').get(-1));
+
+    console.log($('li').first()[0].innerText);
+    console.log($('li').last());
+
+    console.log($('li').eq(3));
+
+
+    console.log($('div').find('span'));
+
+    console.log(jQuery.fn.init());
+
+</script>
+</html>

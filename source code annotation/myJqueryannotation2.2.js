@@ -37,24 +37,28 @@
         constructor: jQuery,
         //定义初始化函数
         init: function (selector) {
+
             //为了把获取到的dom元素，并把获取到的dom元素包装成一个数组，并保存在this中
             //借用数组的splice方法，清空this最终存储的属性
             splice.call(this, 0, this.length);
-            //借用数组的push，把获取到的dom元素包装成一个数组，并保存在this中
-            push.apply(this, Sizzle(selector));
-            //为了可以使用链式编程，返回调用该方法的对象。
-            //解析：一、如果是方法调用模式，this指向调用该方法的对象，return this从而实现链式编程
-            //     二、如果是构造函数调用，默认返回this，return this和不返回没什么区别。
-            return this;
-        },
-        //模仿jq中的css方法，设置dom的样式
-        css: function (styleName, styleValue) {
-            for (var i = 0; i < this.length; i++) {
-                var ele = this[i];
-                ele.style[styleName] = styleValue;
+
+            if(selector == null) return this;//选择器为undefined或null时，直接返回
+
+
+            //判断传入的是一个选择器还是一个dom对象
+            if(jQuery.isString(selector)){
+                //借用数组的push，把获取到的dom元素包装成一个数组，并保存在this中
+                push.apply(this, Sizzle(selector));
+                //为了可以使用链式编程，返回调用该方法的对象。
+            }else {
+                //暂且认为selector是一个DOM元素--->{ 0:selector,length:1 }
+                //如果传入一个dom对象，就把他包装成jq对象，即伪数组
+                this[0]=selector;
+                this.length=1;
             }
 
-            //为了实现链式编程
+            //解析：一、如果是方法调用模式，this指向调用该方法的对象，return this从而实现链式编程
+            //     二、如果是构造函数调用，默认返回this，return this和不返回没什么区别。
             return this;
         }
     };
@@ -93,7 +97,7 @@
         return typeof len == 'number' && len >= 0 && len - 1 in array
     }
 
-    //增加each方法
+    //增加each方法 和类型判断方法
     jQuery.extend({
         each: function (array,callback) {
 
@@ -119,7 +123,7 @@
                     }
                 }
             }
-
+            return this;
         },
 
         //判断是否是字符串类型
@@ -203,7 +207,153 @@
     jQuery.fn.extend({
         each:function(callback){
             jQuery.each(this,callback);
-		 return this;
+            return this;
+        }
+
+    });
+
+    //css模块
+    jQuery.fn.extend({
+        css: function () {
+            /*
+             *传入一个参数 的时候：
+             *      当这个参数是字符串的时候，直接获取第一个dom的该样式的值，并返回
+             *       当这个参数是对象的时候，循环遍历obj，为每个dom设置响应的属性
+             *当传入二个参数的时候，遍历所有的dom，给响应的dom设置响应的样式
+             *
+             * */
+
+            /*
+             * 保存css传入实参的长度（个数）
+             * */
+            var len = arguments.length;
+
+            /*
+             * 如果没有传入参数的话，返回原jq对象，即this，以便实现链式编程
+             * */
+            if (len == 0) return this;
+            /*
+             * 把传入css的参数中的前两个取出来，其他的忽略。
+             *
+             * */
+            var arg0 = arguments[0];
+            var arg1 = arguments[1];
+            /*
+             * 传css的实参的个数为一个的时候判断一下传入的是字符串，还是对象
+             * 如果是字符串，则遍历this中的每一个dom元素，给他们设置这个样式。
+             * 如果是对象，则先遍历此对象，在遍历过程中给this中的每个dom元素设置此属性。
+             *
+             * */
+            if (len == 1) {
+                if (jQuery.isString(arg0)) {
+                    //this是init的实例，保存了获取到的所有的dom元素，是个伪数组，
+                    // 在传入一个字符串时，默认获取第一个dom元素的该属性
+                    var firstDom = this[0];
+                    var styles = window.getComputedStyle(firstDom, null); //获取某dom元素计算后的样式
+                    //styles中存储了firstDom的所有的样式，取出我们需要的样式，即arg0
+                    return styles[arg0];
+                } else {
+                    return this.each(function () {
+
+                        var dom = this;
+
+                        jQuery.each(arg0, function (styleName, styleValue) {
+                            dom.style[styleName] = styleValue;
+                        });
+                    });
+
+                }
+            } else {
+
+                /*
+                 * 如果传入的是两个参数，则遍历this中所有的dom元素，给他们设置此样式（设置单个样式）
+                 * */
+                return this.each(function () {
+                    this.style[arg0] = arg1;
+                })
+            }
+        },
+        /*
+         * 设置元素显示
+         * */
+        show:function(){
+            return this.css('display','block');
+        },
+        /*
+         * 设置元素隐藏
+         * */
+        hide:function(){
+            return this.css('display','none');
+        },
+        /*
+         * 设置元素显示或者隐藏
+         * */
+        toggle:function(){
+            this.each(function(){
+                var $dom = $(this);
+                if($dom.css('display') === 'none'){
+                    $dom.show();
+                }else{
+                    $dom.hide();
+                }
+            });
+        }
+    });
+
+    //dom操作
+    jQuery.fn.extend({
+
+        get:function(){
+            //1、没有参数：返回值是将F的实例转换为真数组
+            //2、有参：
+            //      参数为非负数：直接返回F的实例中指定索引的DOM元素
+            //      参数为负数：返回倒数第几个元素
+            if(arguments.length == 0){
+                //调用makeArray函数 把调用该方法的对象或者伪数组转换成真数组
+                return jQuery.makeArray(this);
+            }else {
+                //取出第一个传去的实参
+                var arg0 = arguments[0];
+                if(arg0 >= 0){
+                    return this[arg0];
+                }else {
+                    return this[this.length + arg0];
+                }
+            }
+        },
+
+        first:function(){
+            //获取jq对象中的第一个dom元素，并包装成jq对象返回
+            //获取第一个Dom元素
+            var firstDom = this.get(0);
+            //将获取到的Dom元素转换成jQ对象，并返回
+            return jQuery(firstDom);
+        },
+
+        last:function(){
+            //获取jq对象中的最后一个dom元素，并包装成jq对象返回
+            var lastDom = this.get(-1);
+            return jQuery(lastDom);
+        },
+
+        eq:function(index){
+            //获取jq对象中索引为index的dom对象，并包装成jq对象返回
+            var dom = this.get(index);
+            return jQuery(dom);
+        },
+
+        find:function(selector){
+            //希望查找this中这些DOM元素的下面的符合指定条件的子元素，由这些子元素构成一个jquery对象
+
+            //实现思路：应该需要首先遍历出每一个div；然后遍历出每一个div的子元素
+            var $ = jQuery();
+
+            this.each(function(){
+                var dom=this.querySelectorAll(selector);
+                jQuery.merge($,dom);
+            });
+
+            return $;
         }
     });
 
