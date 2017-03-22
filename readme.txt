@@ -254,3 +254,66 @@ jQuery的初始化方法 init的设计思路：
                        2、当传入一个对象时，设置this中多个dom的多个属性的值
                   c、传入2个参数时，设置this中所有dom元素某属性的值
 
+
+********************************************************
+
+         2.5 版本  扩展了属性模块的功能  增加了工具类valHooks，扩展了dom操作的indexOf方法
+
+          1、工具类valHooks对象：
+                为了使 表单的各种操作更加具有语义化，而封装的一个工具类
+                 其中包含了 input option select 的set和get方法，
+                 可以设置和获取各种表单的属性值
+
+          2、 dom的方法  indexOf（）
+                调用方式：父元素.indexOf（子元素）
+                功能描述：
+                       判断子元素是否在父元素中，有的话返回索引，没有的话返回-1
+          3、增加了 removeAttr 方法
+                   调用方式：$('xxx').removeAttr(attr)
+                    功能描述：遍历每个元素，然后删除他的attr属性
+
+                    attr和removeAttr实现原理是利用  getAttribute 和setAttribute
+
+          4、增加了 prop方法
+                    调用方式： $('xxx').prop(attr);
+                    功能描述：遍历每个元素，然后设置他的 attr属性
+                    实现原理是利用点语法。
+          5、增加了removeProp方法
+                    调用方式： $('xxx').prop(attr);
+                    功能描述：遍历每个元素，然后删除他的 attr属性
+                    实现原理是利用点语法。
+
+          6、 增加了 hasClass方法
+                    调用方式： $('xxx').hasClass(className);
+                    功能描述： 遍历每个dom对象，如果有某个类名返回true，没有返回false
+
+          7、增加了addClass方法
+                     调用方式： $('xxx').addClass(className);
+                     功能描述： 遍历每个dom对象，为他们添加某个类名，
+                                也可以添加多个类名，如果原来有的话，就不添加，没有的话就添加
+
+          8、增加了removeClass方法
+                    调用方式： $('xxx').removeClass(className);
+                    功能描述： 遍历每个dom对象，为他们添加删除类名
+          9、增加了toogleClass 方法：
+                    调用方式： $('xxx').toggleClass(className);
+                    功能描述： 遍历每个dom对象，传入一个或者多个类名，
+                                如果dom原来有就删除，原来没有就添加类名
+
+          10、增加了val方法：
+                    调用方式： $('xxx').removeClass(value);
+                    功能描述：
+                    当不传入参数时，获取某属性值，当传入value时，设置某属性
+                         的值，和  工具类中的valHooks相关联
+
+                    获取：获取第一个DOM元素的值 $("input").val()
+                        文本框、按钮、textarea checkbox/radio：返回value属性的值
+                        select：如果单选返回选中的option的value，如果是多选返回选中的文本组成数组
+                        option：返回value属性的值或者文本
+
+                    设置：设置每一个DOM元素的值
+                        文本框、按钮、textarea：直接设置value属性的值
+                        checkbox/radio：如果设置的值与checkbox的value属性匹配，就选中它(checked=true)
+                        select：如果设置的值与下面的某个option的value值匹配就选中某个option，
+                        如果都不匹配就取消选中（selectedIndex = -1;）
+
