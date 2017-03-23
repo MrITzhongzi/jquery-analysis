@@ -317,3 +317,31 @@ jQuery的初始化方法 init的设计思路：
                         select：如果设置的值与下面的某个option的value值匹配就选中某个option，
                         如果都不匹配就取消选中（selectedIndex = -1;）
 
+
+**************************************************************************
+
+        2.6 版本 增加了jq中的 事件封装
+
+        实现原理：
+        
+              jq事件封装原理：
+                将所有的时间的名字都保存在一个字符串里，然后用 空格分割一下存到数组中，然后遍历数组中每一个元素
+                给jq。fn添加方法
+
+
+            var eventTypes = "click dblclick mouseenter mouseleave mouseover mouseout mousemove keydown keyup keypress load".split(" ");
+            jQuery.fn.extend({
+                on: function (type, callback) {
+                    return this.each(function () {
+                        var dom = this;
+                        dom.addEventListener(type, callback)
+                    });
+                }
+            });
+
+            jQuery.each(eventTypes, function (i, eventType) {
+                jQuery.fn[eventType] = function (callback) {
+                    return this.on(eventType, callback);
+                }
+            });
+
